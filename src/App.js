@@ -1,39 +1,57 @@
 import React from 'react';
 import { Canvas } from '@react-three/fiber'
 
-import { Loader, Environment, OrbitControls, PerspectiveCamera, Lightformer, SoftShadows } from '@react-three/drei'
-import { EffectComposer, DepthOfField, Noise } from '@react-three/postprocessing'
+import { Stats, Loader, Environment, OrbitControls, PerspectiveCamera, Lightformer, SoftShadows } from '@react-three/drei'
+import { EffectComposer, DepthOfField, Noise, SSR } from '@react-three/postprocessing'
 
 import { state } from './State'
 import { useSnapshot } from 'valtio'
 
+import { Leva, useControls } from 'leva'
+
+function Postprocessing()
+{
+  const { usePostprocessing, softShadow } = useControls({usePostprocessing: true, softShadow: false})
+  return (
+    <>
+    { usePostprocessing && 
+    <EffectComposer disableNormalPass>
+      <SSR/>
+      <DepthOfField target={[0, 0, -2.5]} focusRange={0.1} bokehScale={10} />
+      <Noise premultiply/>
+    </EffectComposer> }
+    { softShadow && <SoftShadows/>}
+    </>
+  )
+}
+
 function Env()
 {
-  const useCustomEnv = false;
-  if(useCustomEnv)
+  const { usePresetEnvironment } = useControls({usePresetEnvironment: true})
+  if(usePresetEnvironment)
   {
     return (
-      <Environment resolution={512}>
-      {/* Ceiling */}
-      <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, -9]} scale={[10, 1, 1]} />
-      <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, -6]} scale={[10, 1, 1]} />
-      <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, -3]} scale={[10, 1, 1]} />
-      <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, 0]} scale={[10, 1, 1]} />
-      <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, 3]} scale={[10, 1, 1]} />
-      <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, 6]} scale={[10, 1, 1]} />
-      <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, 9]} scale={[10, 1, 1]} />
-      {/* Sides */}
-      <Lightformer intensity={2} rotation-y={Math.PI / 2} position={[-50, 2, 0]} scale={[100, 2, 1]} />
-      <Lightformer intensity={2} rotation-y={-Math.PI / 2} position={[50, 2, 0]} scale={[100, 2, 1]} />
-      {/* Key */}
-      <Lightformer form="ring" color="red" intensity={10} scale={2} position={[10, 5, 10]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
-    </Environment>
+      <Environment preset='dawn' background={true} blur={1.0}/>
     )
   }
   else
   {
     return (
-      <Environment preset='dawn' background={true} blur={1.0}/>
+      <Environment resolution={1024}>
+        {/* Ceiling */}
+        <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, -9]} scale={[10, 1, 1]} />
+        <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, -6]} scale={[10, 1, 1]} />
+        <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, -3]} scale={[10, 1, 1]} />
+        <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, 0]} scale={[10, 1, 1]} />
+        <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, 3]} scale={[10, 1, 1]} />
+        <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, 6]} scale={[10, 1, 1]} />
+        <Lightformer intensity={2} rotation-x={Math.PI / 2} position={[0, 4, 9]} scale={[10, 1, 1]} />
+        {/* Sides */}
+        <Lightformer intensity={2} rotation-y={Math.PI / 2} position={[-50, 2, 0]} scale={[100, 2, 1]} />
+        <Lightformer intensity={2} rotation-y={-Math.PI / 2} position={[50, 2, 0]} scale={[100, 2, 1]} />
+        {/* Key */}
+        <Lightformer form="ring" color="red" intensity={10} scale={2} position={[10, 5, 10]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
+    </Environment>
     )
   }
 }
@@ -42,9 +60,12 @@ function App()
 {
   const snap = useSnapshot(state)
   const page = state.pages[snap.currentPage]
+  const { debugStats } = useControls({ debugStats: false })
   return (
     <>
-      <Canvas shadows dpr={[1, 2]} >
+      { debugStats && <Stats /> }
+      <Leva oneLineLabels collapsed />
+      <Canvas shadows dpr={[1, 2]} className='fadecanvas'>
         <color attach="background" args={['#ffffff']} />
         <fog attach="fog" args={['#fff0ff', 1, 100]} />
         <spotLight position={[5, 9, 5]} angle={1.0} penumbra={0.6} intensity={5} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.001}/>
@@ -68,13 +89,9 @@ function App()
           </mesh>
         </group>
         <Env/>
-        <EffectComposer>
-          <DepthOfField target={[0, 0, -2.5]} focusRange={0.1} bokehScale={10} />
-          <Noise premultiply/>
-        </EffectComposer>
-        <SoftShadows />
+        <Postprocessing/>
       </Canvas>
-      <Loader />
+      <Loader/>
     </>
   );
 }
