@@ -1,17 +1,38 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import './index.css'
+
+import App from './App'
+
+import { state } from './State'
+import { useSnapshot } from 'valtio'
+
+function Overlay() {
+  const snap = useSnapshot(state)
+  return (
+    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+      <a href="https://github.com/uspiritwolf" style={{ position: 'absolute', bottom: 40, left: 90, fontSize: '17px' }}>
+        Dev: uspriitwolf
+      </a>
+      <a href="https://www.artstation.com/riiakarpenkoo" style={{ position: 'absolute', bottom: 60, left: 90, fontSize: '17px' }}>
+        Art: riiakarpenkoo
+      </a>
+      <div className="shadowText" style={{ position: 'absolute', bottom: 40, right: 40, fontSize: '17px' }}>05/27/2023</div>
+      { snap.currentPage > 0 && 
+      <button className="buttonnext" style={{ position: 'absolute', bottom: '50%', left: 120, pointerEvents:'auto'}} onClick={() => state.currentPage -= 1 }>
+        PREV
+      </button> }
+      { snap.currentPage < (snap.pages.length - 1) && <button className="buttonnext" style={{ position: 'absolute', bottom: '50%', right: 120, pointerEvents:'auto'}} onClick={() => state.currentPage += 1 } >
+        NEXT
+      </button> }
+    </div>
+  )
+}
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <App />
+    <Overlay />
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
