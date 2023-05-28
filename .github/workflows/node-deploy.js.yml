@@ -14,7 +14,7 @@ on:
 
 jobs:
   predeploy:
-    if: ${{ inputs.runScript == predeploy }}
+    if: ${{ inputs.runScript == 'predeploy' }}
     runs-on: ubuntu-latest
 
     strategy:
@@ -32,7 +32,7 @@ jobs:
     - run: npm run predeploy
     
   deploy:
-    if: ${{ inputs.runScript == deploy }}
+    if: ${{ inputs.runScript == 'deploy' }}
     runs-on: ubuntu-latest
 
     strategy:
