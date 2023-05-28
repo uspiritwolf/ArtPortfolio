@@ -7,7 +7,7 @@ import React from 'react'
 import { useGLTF } from '@react-three/drei'
 
 export function Page2(props) {
-  const { nodes, materials } = useGLTF('/Models/greenhouse-center-transformed.glb')
+  const { nodes, materials } = useGLTF(process.env.PUBLIC_URL+'/Models/greenhouse-center-transformed.glb')
   return (
     <group {...props} dispose={null} scale={0.6} position={[0, 0.4, 0]}>
       <mesh castShadow receiveShadow geometry={nodes.Cube001_TT_checker_1_0.geometry} material={materials.TT_checker_1} />
@@ -31,4 +31,4 @@ export function Page2(props) {
   )
 }
 
-useGLTF.preload('/Models/greenhouse-center-transformed.glb')
+useGLTF.preload(process.env.PUBLIC_URL+'/Models/greenhouse-center-transformed.glb')
