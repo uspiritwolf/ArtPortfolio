@@ -43,6 +43,8 @@ jobs:
     - uses: de-vri-es/setup-git-credentials@v2
       with:
         credentials: ${{secrets.GIT_CREDENTIALS}}
+    - run: git config --global user.email "uspiritwolf@outlook.com"
+    - run: git config --global user.name "Github Action"
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
