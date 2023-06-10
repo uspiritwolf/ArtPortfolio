@@ -1,0 +1,56 @@
+name: Deploy GitHub Pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      runScript:
+        description: 'Run Script'
+        required: true
+        type: choice
+        options:
+        - deploy
+        - predeploy
+    
+
+jobs:
+  predeploy:
+    if: ${{ inputs.runScript == 'predeploy' }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run predeploy
+    
+  deploy:
+    if: ${{ inputs.runScript == 'deploy' }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - uses: de-vri-es/setup-git-credentials@v2
+      with:
+        credentials: ${{secrets.GIT_CREDENTIALS}}
+    - run: git config --global user.email "uspiritwolf@outlook.com"
+    - run: git config --global user.name "Github Action"
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run deploy
+  
