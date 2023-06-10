@@ -31,7 +31,7 @@ function Env()
   if(usePresetEnvironment)
   {
     return (
-      <Environment preset='dawn' background={true} blur={1.0}/>
+      <Environment path={process.env.PUBLIC_URL+'/hdri/'} files="kiara_1_dawn_1k.hdr" background={true} blur={1.0}/>
     )
   }
   else
